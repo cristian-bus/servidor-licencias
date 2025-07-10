@@ -133,8 +133,6 @@ app.get('/api/data/profile', authenticateToken, (req, res) => {
   });
 });
 
-
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Servidor de licencias corriendo en http://localhost:${PORT}`);
-});
+// Exporta la app de Express para que Vercel pueda usarla como una función serverless.
+// Vercel se encarga de 'app.listen()' por nosotros.
+module.exports = app;
