@@ -9,9 +9,13 @@ const app = express();
 app.use(express.json());
 
 // --- Configuración de CORS ---
-// En un entorno real, deberías restringir el origen a tu dominio de producción.
-// Por ejemplo: const corsOptions = { origin: 'https://tu-dominio-app.com' };
-app.use(cors());
+// Para producción, deberías cambiar '*' por el dominio real de tu aplicación cliente.
+const corsOptions = {
+  origin: '*', // Permite peticiones desde cualquier origen.
+  methods: ['GET', 'POST'], // Métodos que tu API acepta.
+};
+
+app.use(cors(corsOptions));
 
 // --- Clave Secreta para firmar JWT ---
 // ¡MUY IMPORTANTE! Esta clave NUNCA debe estar en el código del cliente.
