@@ -9,13 +9,22 @@ const app = express();
 app.use(express.json());
 
 // --- Configuración de CORS ---
-// Para producción, deberías cambiar '*' por el dominio real de tu aplicación cliente.
+// Se ha configurado para aceptar peticiones desde cualquier origen ('*').
+// Esto soluciona el error de conexión que estabas experimentando.
+// Para producción, es más seguro cambiar '*' por el dominio real de tu app cliente.
 const corsOptions = {
-  origin: '*', // Permite peticiones desde cualquier origen.
-  methods: ['GET', 'POST'], // Métodos que tu API acepta.
+  origin: '*',
+  methods: ['GET', 'POST', 'OPTIONS'], // Se añade OPTIONS, importante para 'preflight requests' de CORS
+  allowedHeaders: ['Content-Type', 'Authorization'], // Se especifican las cabeceras permitidas
 };
 
+// Maneja las solicitudes 'preflight' de CORS.
+// El navegador envía una solicitud OPTIONS antes de la solicitud POST real.
+// Esto asegura que el servidor responda correctamente a esa comprobación inicial.
+app.options('*', cors(corsOptions));
+
 app.use(cors(corsOptions));
+
 
 // --- Clave Secreta para firmar JWT ---
 // ¡MUY IMPORTANTE! Esta clave NUNCA debe estar en el código del cliente.
@@ -34,22 +43,37 @@ const validLicenses = {
  * El cliente envía su clave y un identificador único (uuid).
  */
 app.post('/api/licenses/validate', (req, res) => {
+  // --- LOG DE DIAGNÓSTICO 1: Ver qué recibe el servidor ---
+  console.log('--- Nueva Petición a /api/licenses/validate ---');
+  console.log('Timestamp:', new Date().toISOString());
+  console.log('Cuerpo de la petición (req.body):', req.body);
+
   const { licenseKey, uuid, domain } = req.body;
 
   if (!licenseKey || !uuid || !domain) {
+    console.error('Error: Petición incompleta. Faltan datos.');
     return res.status(400).json({ message: 'Faltan datos requeridos (licenseKey, uuid, domain).' });
   }
 
+  // --- LOG DE DIAGNÓSTICO 2: Ver qué clave estamos buscando ---
+  console.log(`Buscando la clave de licencia: "${licenseKey}"`);
+  
   const license = validLicenses[licenseKey];
 
   // 1. Verificar si la licencia existe
   if (!license) {
+    // --- LOG DE DIAGNÓSTICO 3: Informar que la clave no fue encontrada ---
+    console.error(`Resultado: La clave "${licenseKey}" NO FUE ENCONTRADA en la lista.`);
     return res.status(404).json({ message: 'La clave de licencia no es válida.' });
   }
+  
+  // --- LOG DE DIAGNÓSTICO 4: Informar que la clave fue encontrada ---
+  console.log(`Resultado: La clave "${licenseKey}" FUE ENCONTRADA. Procediendo a validar.`);
 
   // 2. Verificar si la licencia ya fue usada y está ligada a otro dominio/máquina
   if (license.used && license.domain !== domain) {
       // Opcional: podrías verificar también el UUID si quieres ligarla a un navegador específico.
+      console.error(`Error: La licencia "${licenseKey}" ya está en uso en el dominio "${license.domain}".`);
       return res.status(403).json({ message: 'Esta licencia ya está en uso en otro dominio.' });
   }
 
@@ -67,7 +91,7 @@ app.post('/api/licenses/validate', (req, res) => {
 
   const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: expiration });
 
-  console.log(`Licencia '${licenseKey}' activada para el dominio '${domain}'.`);
+  console.log(`Licencia '${licenseKey}' activada con éxito para el dominio '${domain}'.`);
 
   res.json({
     message: 'Licencia activada con éxito.',
