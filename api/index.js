@@ -7,7 +7,7 @@ require('dotenv').config(); // Para manejar variables de entorno
 
 const app = express();
 app.use(express.json());
-
+// Forzando el redespliegue
 // --- Configuración de CORS ---
 // Se ha configurado para aceptar peticiones desde cualquier origen ('*').
 // Esto soluciona el error de conexión que estabas experimentando.
