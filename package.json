@@ -1,18 +1,15 @@
 {
-  "name": "mi-servidor-licencias",
+  "name": "servidor-licencias",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Servidor de licencias para mi app de taller",
+  "main": "api/licenses/validate.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "author": "Cristian Horacio Bustos",
   "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
     "cors": "^2.8.5",
-    "dotenv": "^17.1.0",
     "jsonwebtoken": "^9.0.2"
   }
 }
