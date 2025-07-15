@@ -8,6 +8,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'clave-super-secreta-para-produccio
 const validLicenses = {
   'TALLERPRO-VALIDA-1234-5678': { used: false, domain: null, type: 'PRO_LIFETIME' },
   'TALLERPRO-ANUAL-ABCD-EFGH': { used: false, domain: null, type: 'PRO_YEARLY' },
+'TALLERPRO-ANUAL-ABCD-1234': { used: false, domain: null, type: 'PRO_YEARLY' },
 };
 
 // Esta es la función serverless que Vercel ejecutará.
